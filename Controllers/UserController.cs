@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyGameList.Helpers;
 using MyGameList.Models;
 
 namespace MyGameList.Controllers
@@ -10,11 +11,14 @@ namespace MyGameList.Controllers
     public class UserController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly AuthManager _authManager;
 
-        public UserController(AppDbContext context)
+        public UserController(AppDbContext context, AuthManager authManager)
         {
             // inject AppDbContext into the controller so it can interact with database
             _context = context; // AppDbContext dependency injection
+
+            _authManager = authManager; // for JWT tokens
         }
 
         
@@ -129,7 +133,7 @@ namespace MyGameList.Controllers
             {
                 // check if the user already exists
                 var currentUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Username == model.Username);
+                    .FirstOrDefaultAsync(u => u.Username == model.Username); // using firstordefault because username isnt a primary key
 
                 if (currentUser != null)
                 {
@@ -159,6 +163,31 @@ namespace MyGameList.Controllers
         }
 
 
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(Login model)
+        {
+            // find the user by username
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+
+            if (user == null) // User not found
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            // verify the password using the PasswordHasher
+            var passwordVerificationResult = new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, model.Password);
+
+            if (passwordVerificationResult == PasswordVerificationResult.Failed) // Incorrect password
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            // if credentials are correct, generate a JWT token
+            var token = _authManager.GenerateJwtToken(user.userId.ToString(), user.Username);
+
+            return Ok(new { Token = token });
+        }
 
 
     }
