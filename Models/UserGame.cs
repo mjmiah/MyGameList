@@ -8,19 +8,16 @@
 
         public int Rating { get; set; }
 
-        //public User User { get; set; }
-
-        //public Game Game { get; set; }
-
+        public string? igdbId { get; set; }
 
         // constructor for UserGame
-        public UserGame(int userId, int gameId) //User user, Game game)
+        public UserGame() { } 
+        public UserGame(int userId, int gameId, string igdbId)
         {
             this.userId = userId;
             this.gameId = gameId;
             this.Rating = 0;
-            //this.User = user;
-            //this.Game = game;
+            this.igdbId = igdbId;
         }
     }
 }
