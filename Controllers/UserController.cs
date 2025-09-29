@@ -54,7 +54,7 @@ namespace MyGameList.Controllers
 
 
         [HttpPost("{userId}/games/{gameId}")] // add a game to the user's list
-        public async Task<IActionResult> AddGame(int userId, int gameId)
+        public async Task<IActionResult> AddGame(int userId, int gameId, string igdbId)
         {
             var user = await _context.Users.FindAsync(userId); // get the user from their id
 
@@ -70,7 +70,7 @@ namespace MyGameList.Controllers
                 return NotFound($"Unable to find game {gameId}");
             }
 
-            var userGame = new UserGame(userId, gameId); //user, game);
+            var userGame = new UserGame(userId, gameId, igdbId); //user, game);
 
             user.UserGames.Add(userGame); // add the game to the list
             await _context.SaveChangesAsync(); // save the list to the database
