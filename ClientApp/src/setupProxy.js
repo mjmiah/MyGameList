@@ -5,7 +5,7 @@ const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_H
   env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'http://localhost:7019';
 
 const context = [
-    "/api",  // <-- This will now proxy ALL "/api" requests
+    "/api",  // <-- This will proxy all "/api" requests
 ];
 
 const onError = (err, req, resp, target) => {

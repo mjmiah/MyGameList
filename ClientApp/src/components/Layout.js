@@ -1,14 +1,13 @@
 ﻿import React from 'react';
-import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import '../custom.css';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, loggedInUser, setLoggedInUser }) => {
     return (
         <div>
             {/* Navbar */}
-            <Navbar />
-               
+            <Navbar loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} />
+
             {/* Main Content */}
             <main>{children}</main>
         </div>

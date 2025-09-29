@@ -1,10 +1,12 @@
 ﻿import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = () => {
+const LoginPage = ({ setLoggedInUser }) => {
     // State to hold form data
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -17,11 +19,10 @@ const LoginPage = () => {
             return;
         }
 
-        const user = { Username, Password };
+        const user = { username: Username, password: Password }; // match backend property names
 
         // Make the POST request to the backend (API)
         try {
-            //console.log(JSON.stringify(user));
             const response = await fetch('/api/User/login', {
                 method: 'POST',
                 headers: {
@@ -31,16 +32,23 @@ const LoginPage = () => {
             });
 
             if (response.ok) {
+               
 
-                // Assuming the API returns a JWT token
+                // API returns a JWT token
                 const data = await response.json();
                 const token = data.token;
 
-                // Store JWT token in localStorage (or sessionStorage)
+                // Store JWT token and username in localStorage
                 localStorage.setItem('token', token);
+                localStorage.setItem('username', Username);
 
-                // Redirect to the profile page or any other protected page
-                window.location.href = '/profile'; 
+                // Update logged-in user state
+                if (setLoggedInUser) {
+                    setLoggedInUser({ username: Username });
+                }
+
+                // Redirect to the profile page or any protected page
+                navigate('/profile');
 
             } else {
                 const text = await response.text();
@@ -69,7 +77,7 @@ const LoginPage = () => {
                     />
                 </div>
                 <div style={{ marginBottom: '4%' }} className="form-group">
-                    <label style={{ marginRight: '1%' }}  htmlFor="password">Password</label>
+                    <label style={{ marginRight: '1%' }} htmlFor="password">Password</label>
                     <input
                         type="password"
                         id="password"
